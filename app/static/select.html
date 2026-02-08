@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>콘텐츠 생성 방식 선택</title>
+    <link href="https://fonts.googleapis.com/css2?family=Pretendard:wght@400;600;700&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            --primary-color: #4f46e5;
+            --primary-hover: #4338ca;
+            --bg-color: #f9fafb;
+            --card-bg: #ffffff;
+            --text-main: #111827;
+            --text-sub: #6b7280;
+            --border-color: #e5e7eb;
+        }
+
+        body {
+            font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, system-ui, Roboto, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            margin: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 1000px;
+            padding: 40px 20px;
+            text-align: center;
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 12px;
+            letter-spacing: -0.02em;
+        }
+
+        .subtitle {
+            font-size: 1.1rem;
+            color: var(--text-sub);
+            margin-bottom: 50px;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 24px;
+        }
+
+        .card {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 24px;
+            padding: 40px 30px;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+        }
+
+        /* 호버 효과: 살짝 커지며 그림자와 테두리 강조 */
+        .card:hover {
+            transform: translateY(-10px);
+            border-color: var(--primary-color);
+            box-shadow: 0 20px 25px -5px rgba(79, 70, 229, 0.1), 0 10px 10px -5px rgba(79, 70, 229, 0.04);
+        }
+
+        /* 카드 클릭 시 눌리는 느낌 */
+        .card:active {
+            transform: scale(0.98);
+        }
+
+        .icon-wrapper {
+            width: 80px;
+            height: 80px;
+            background: #f3f4ff;
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 24px;
+            font-size: 32px;
+            transition: background 0.3s;
+        }
+
+        .card:hover .icon-wrapper {
+            background: var(--primary-color);
+        }
+
+        .card:hover .icon-wrapper .icon {
+            filter: brightness(0) invert(1);
+        }
+
+        h3 {
+            font-size: 1.4rem;
+            font-weight: 700;
+            margin: 0 0 12px 0;
+        }
+
+        .card p {
+            font-size: 1rem;
+            color: var(--text-sub);
+            line-height: 1.5;
+            margin: 0;
+        }
+
+        /* 반응형 처리 */
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 2rem;
+            }
+
+            .grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h1>다국어 콘텐츠 생성</h1>
+        <p class="subtitle">나의 목소리로 만들 콘텐츠의 시작점을 선택하세요.</p>
+
+        <div class="grid">
+            <div class="card" onclick="location.href='/process.html?mode=record'">
+                <div class="icon-wrapper">
+                    <div class="icon">🎤</div>
+                </div>
+                <h3>음성 녹음</h3>
+                <p>마이크를 통해 실시간으로<br>나의 음성을 들려주세요.</p>
+            </div>
+
+            <div class="card" onclick="location.href='/process.html?mode=upload'">
+                <div class="icon-wrapper">
+                    <div class="icon">📁</div>
+                </div>
+                <h3>파일 업로드</h3>
+                <p>이미 준비된 음성 파일<br>(mp3, wav)을 올려주세요.</p>
+            </div>
+
+            <div class="card" onclick="location.href='/process.html?mode=text'">
+                <div class="icon-wrapper">
+                    <div class="icon">✍️</div>
+                </div>
+                <h3>텍스트 입력</h3>
+                <p>작성된 대본을 바탕으로<br>새로운 음성을 생성합니다.</p>
+            </div>
+        </div>
+    </div>
+</body>
+
+</html>

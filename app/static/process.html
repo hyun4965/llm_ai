@@ -1,0 +1,379 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI 콘텐츠 생성</title>
+    <link href="https://fonts.googleapis.com/css2?family=Pretendard:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <style>
+        :root {
+            --primary-color: #4f46e5;
+            /* Indigo */
+            --primary-hover: #4338ca;
+            --danger-color: #ef4444;
+            --bg-color: #f3f4f6;
+            --card-bg: #ffffff;
+            --text-main: #1f2937;
+            --text-sub: #6b7280;
+            --border-color: #e5e7eb;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, system-ui, Roboto, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            background: var(--card-bg);
+            width: 100%;
+            max-width: 480px;
+            padding: 40px;
+            border-radius: 24px;
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease;
+        }
+
+        h1 {
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--text-main);
+            margin-bottom: 24px;
+            text-align: center;
+        }
+
+        h1 i {
+            color: var(--primary-color);
+            margin-right: 8px;
+        }
+
+        .input-group {
+            margin-bottom: 24px;
+            animation: fadeIn 0.5s ease-in-out;
+        }
+
+        label {
+            display: block;
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text-main);
+            margin-bottom: 8px;
+        }
+
+        label i {
+            color: var(--primary-color);
+            margin-right: 6px;
+        }
+
+        /* Select Box Styling */
+        .select-wrapper {
+            position: relative;
+        }
+
+        select {
+            width: 100%;
+            padding: 14px 16px;
+            font-size: 16px;
+            border: 2px solid var(--border-color);
+            border-radius: 12px;
+            background-color: #fff;
+            color: var(--text-main);
+            appearance: none;
+            cursor: pointer;
+            transition: border-color 0.2s;
+        }
+
+        select:focus {
+            outline: none;
+            border-color: var(--primary-color);
+        }
+
+        .select-arrow {
+            position: absolute;
+            right: 16px;
+            top: 50%;
+            transform: translateY(-50%);
+            pointer-events: none;
+            color: var(--text-sub);
+        }
+
+        /* Text Area */
+        textarea {
+            width: 100%;
+            padding: 14px;
+            font-size: 16px;
+            border: 2px solid var(--border-color);
+            border-radius: 12px;
+            resize: none;
+            outline: none;
+            transition: border-color 0.2s;
+            height: 120px;
+        }
+
+        textarea:focus {
+            border-color: var(--primary-color);
+        }
+
+        /* File Input */
+        input[type="file"] {
+            width: 100%;
+            padding: 10px;
+            background: #f9fafb;
+            border: 2px dashed var(--border-color);
+            border-radius: 12px;
+            cursor: pointer;
+        }
+
+        /* Buttons */
+        .btn {
+            width: 100%;
+            padding: 16px;
+            border: none;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 8px;
+        }
+
+        #recordBtn {
+            background-color: #e0e7ff;
+            color: var(--primary-color);
+        }
+
+        #recordBtn:hover {
+            background-color: #c7d2fe;
+        }
+
+        #recordBtn.recording {
+            background-color: var(--danger-color);
+            color: white;
+            animation: pulse 1.5s infinite;
+        }
+
+        #submitBtn {
+            background: linear-gradient(135deg, var(--primary-color), #6366f1);
+            color: white;
+            margin-top: 12px;
+            box-shadow: 0 4px 12px rgba(79, 70, 229, 0.3);
+        }
+
+        #submitBtn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 15px rgba(79, 70, 229, 0.4);
+        }
+
+        #submitBtn:active {
+            transform: translateY(0);
+        }
+
+        /* Status & Helper Text */
+        .helper-text {
+            font-size: 13px;
+            color: var(--text-sub);
+            margin-bottom: 12px;
+        }
+
+        #status {
+            margin-top: 16px;
+            font-size: 14px;
+            text-align: center;
+            color: var(--primary-color);
+            font-weight: 500;
+            min-height: 20px;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        /* Animations */
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes pulse {
+            0% {
+                box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.4);
+            }
+
+            70% {
+                box-shadow: 0 0 0 10px rgba(239, 68, 68, 0);
+            }
+
+            100% {
+                box-shadow: 0 0 0 0 rgba(239, 68, 68, 0);
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h1 id="mode-title"><i class="fa-solid fa-wand-magic-sparkles"></i>기능 수행</h1>
+
+        <div class="input-group">
+            <label><i class="fa-solid fa-language"></i>변환할 언어 선택</label>
+            <div class="select-wrapper">
+                <select id="target-lang">
+                    <option value="en">🇺🇸 영어 (English)</option>
+                    <option value="ja">🇯🇵 일본어 (日本語)</option>
+                    <option value="zh">🇨🇳 중국어 (中文)</option>
+                    <option value="es">🇪🇸 스페인어 (Español)</option>
+                </select>
+                <div class="select-arrow"><i class="fa-solid fa-chevron-down"></i></div>
+            </div>
+        </div>
+
+        <div id="record-area" class="input-group hidden">
+            <label><i class="fa-solid fa-microphone-lines"></i>음성 녹음</label>
+            <p class="helper-text">목소리를 10초 내외로 선명하게 녹음해 주세요.</p>
+            <button id="recordBtn" class="btn">
+                <i class="fa-solid fa-microphone"></i> <span>녹음 시작</span>
+            </button>
+        </div>
+
+        <div id="upload-area" class="input-group hidden">
+            <label><i class="fa-solid fa-cloud-arrow-up"></i>음성 파일 업로드</label>
+            <p class="helper-text">MP3, WAV, M4A 등 오디오 파일을 선택하세요.</p>
+            <input type="file" id="audio-file" accept="audio/*">
+        </div>
+
+        <div id="text-area" class="input-group hidden">
+            <label><i class="fa-solid fa-keyboard"></i>텍스트 입력</label>
+            <textarea id="text-input" placeholder="AI가 변환할 대본을 여기에 입력하세요..."></textarea>
+        </div>
+
+        <div id="status"></div>
+        <button id="submitBtn" class="btn">
+            <span>AI 콘텐츠 생성 시작</span> <i class="fa-solid fa-rocket"></i>
+        </button>
+    </div>
+
+    <script>
+        const urlParams = new URLSearchParams(window.location.search);
+        const mode = urlParams.get('mode');
+        const statusEl = document.getElementById('status');
+        const modeTitle = document.getElementById('mode-title');
+
+        // 1. 모드에 따른 UI 노출 및 제목 설정
+        if (mode === 'record') {
+            document.getElementById('record-area').classList.remove('hidden');
+            modeTitle.innerHTML = '<i class="fa-solid fa-microphone-lines"></i> 음성 복제 및 번역';
+        } else if (mode === 'upload') {
+            document.getElementById('upload-area').classList.remove('hidden');
+            modeTitle.innerHTML = '<i class="fa-solid fa-file-audio"></i> 오디오 번역';
+        } else if (mode === 'text') {
+            document.getElementById('text-area').classList.remove('hidden');
+            modeTitle.innerHTML = '<i class="fa-solid fa-keyboard"></i> 텍스트 음성 변환';
+        } else {
+            // 모드가 없을 경우 기본 처리 (예: 텍스트 모드)
+            document.getElementById('text-area').classList.remove('hidden');
+        }
+
+        // 2. 녹음 로직
+        let mediaRecorder;
+        let audioChunks = [];
+        const recordBtn = document.getElementById('recordBtn');
+        const recordBtnText = recordBtn.querySelector('span');
+        const recordBtnIcon = recordBtn.querySelector('i');
+
+        recordBtn.onclick = async () => {
+            if (!recordBtn.classList.contains("recording")) {
+                // 녹음 시작
+                try {
+                    const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+                    mediaRecorder = new MediaRecorder(stream);
+                    audioChunks = [];
+                    mediaRecorder.ondataavailable = e => audioChunks.push(e.data);
+                    mediaRecorder.start();
+
+                    // UI 업데이트
+                    recordBtn.classList.add("recording");
+                    recordBtnText.textContent = "녹음 중지";
+                    recordBtnIcon.className = "fa-solid fa-stop";
+                    statusEl.textContent = "🎙️ 녹음 중... (버튼을 다시 눌러 멈추세요)";
+                } catch (err) {
+                    alert("마이크 접근 권한이 필요합니다.");
+                }
+            } else {
+                // 녹음 중지
+                mediaRecorder.stop();
+
+                // UI 업데이트
+                recordBtn.classList.remove("recording");
+                recordBtnText.textContent = "다시 녹음하기";
+                recordBtnIcon.className = "fa-solid fa-rotate-right";
+                statusEl.textContent = "✅ 녹음이 완료되었습니다. 생성 시작을 눌러주세요.";
+            }
+        };
+
+        // 3. 서버 전송 로직
+        document.getElementById('submitBtn').onclick = async () => {
+            const lang = document.getElementById('target-lang').value;
+            const formData = new FormData();
+            formData.append("target_lang", lang);
+            formData.append("mode", mode);
+
+            // 유효성 검사 및 데이터 추가
+            if (mode === 'record') {
+                if (audioChunks.length === 0) return alert("먼저 녹음을 진행해 주세요!");
+                const blob = new Blob(audioChunks, { type: 'audio/webm' });
+                formData.append("audio", blob, "record.webm");
+            } else if (mode === 'upload') {
+                const file = document.getElementById('audio-file').files[0];
+                if (!file) return alert("파일을 선택하세요!");
+                formData.append("audio", file);
+            } else {
+                const text = document.getElementById('text-input').value;
+                if (!text) return alert("텍스트를 입력하세요!");
+                formData.append("text", text);
+            }
+
+            // 로딩 상태 표시
+            statusEl.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> AI가 콘텐츠를 생성하고 있습니다...';
+            document.getElementById('submitBtn').disabled = true;
+            document.getElementById('submitBtn').style.opacity = "0.7";
+
+            try {
+                const res = await fetch("/api/generate-content", { method: "POST", body: formData });
+                const data = await res.json();
+
+                // 성공 시
+                sessionStorage.setItem("resultData", JSON.stringify(data));
+                location.href = "/result.html";
+            } catch (e) {
+                statusEl.innerHTML = `<span style="color:var(--danger-color)"><i class="fa-solid fa-circle-exclamation"></i> 오류: ${e.message}</span>`;
+                document.getElementById('submitBtn').disabled = false;
+                document.getElementById('submitBtn').style.opacity = "1";
+            }
+        };
+    </script>
+</body>
+
+</html>

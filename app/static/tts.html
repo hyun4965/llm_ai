@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <title>TTS Demo</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <style>
+    :root {
+      --bg: #f3f4f6;
+      --card-bg: #ffffff;
+      --text-main: #111827;
+      --text-muted: #6b7280;
+      --primary: #2563eb;
+      --primary-soft: #e0ecff;
+      --border-subtle: #e5e7eb;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui,
+        sans-serif;
+      background: radial-gradient(circle at top, #e0edff 0, var(--bg) 45%);
+      color: var(--text-main);
+    }
+
+    .page {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 32px 16px;
+    }
+
+    .card {
+      width: 100%;
+      max-width: 720px;
+      background: var(--card-bg);
+      border-radius: 20px;
+      box-shadow: 0 22px 50px rgba(15, 23, 42, 0.12);
+      padding: 24px 22px 22px;
+      border: 1px solid var(--border-subtle);
+    }
+
+    header {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      align-items: center;
+      margin-bottom: 16px;
+    }
+
+    .title {
+      font-size: 22px;
+      font-weight: 700;
+    }
+
+    .subtitle {
+      font-size: 13px;
+      color: var(--text-muted);
+      margin-top: 4px;
+    }
+
+    nav {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      font-size: 12px;
+    }
+
+    nav a {
+      text-decoration: none;
+      color: var(--text-muted);
+      padding: 4px 10px;
+      border-radius: 999px;
+      border: 1px solid transparent;
+    }
+
+    nav a:hover {
+      background: var(--primary-soft);
+      color: var(--primary);
+      border-color: #bfd4ff;
+    }
+
+    nav a.active {
+      background: var(--primary);
+      color: white;
+    }
+
+    textarea {
+      width: 100%;
+      min-height: 110px;
+      resize: vertical;
+      padding: 10px 12px;
+      border-radius: 12px;
+      border: 1px solid var(--border-subtle);
+      font-size: 14px;
+      font-family: inherit;
+      margin-top: 6px;
+    }
+
+    textarea:focus {
+      outline: none;
+      border-color: var(--primary);
+      box-shadow: 0 0 0 1px var(--primary-soft);
+    }
+
+    .btn {
+      margin-top: 14px;
+      padding: 9px 18px;
+      border-radius: 999px;
+      border: none;
+      background: var(--primary);
+      color: white;
+      font-size: 14px;
+      font-weight: 500;
+      cursor: pointer;
+    }
+
+    .btn:hover {
+      background: #1e4fd4;
+    }
+
+    .audio-wrapper {
+      margin-top: 18px;
+      display: none;
+    }
+
+    audio {
+      width: 100%;
+    }
+
+    .status {
+      margin-top: 10px;
+      font-size: 12px;
+      color: var(--text-muted);
+    }
+
+    footer {
+      margin-top: 16px;
+      font-size: 11px;
+      color: var(--text-muted);
+    }
+
+    @media (max-width: 640px) {
+      .card {
+        padding: 18px 16px 16px;
+      }
+
+      header {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+
+      .title {
+        font-size: 18px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="page">
+    <div class="card">
+      <header>
+        <div>
+          <div class="title">🔊 Text-to-Speech (TTS) Demo</div>
+          <div class="subtitle">
+            텍스트를 입력하고 <code>/tts/</code> 엔드포인트를 호출하여 생성된
+            음성을 재생합니다.
+          </div>
+        </div>
+        <nav>
+          <a href="index.html">홈</a>
+          <a href="stt.html">STT</a>
+          <a href="tts.html" class="active">TTS</a>
+          <a href="stt-tts.html">STT→GPT→TTS</a>
+        </nav>
+      </header>
+
+      <main>
+        <label for="text-input" style="font-size:13px;font-weight:500;">
+          텍스트 입력
+        </label>
+        <textarea
+          id="text-input"
+          placeholder="여기에 음성으로 변환할 텍스트를 입력하세요..."
+        ></textarea>
+
+        <button id="generate-tts" class="btn">TTS 생성</button>
+
+        <div id="status" class="status">
+          텍스트를 입력한 뒤 버튼을 누르면 음성이 생성됩니다.
+        </div>
+
+        <div class="audio-wrapper" id="audio-wrapper">
+          <audio id="audio-player" controls></audio>
+        </div>
+      </main>
+
+      <footer>
+        응답 JSON의 <code>file_path</code> 경로를 사용해 오디오를 재생하며, 캐시
+        무효화를 위해 쿼리 파라미터로 timestamp를 함께 추가합니다.
+      </footer>
+    </div>
+  </div>
+
+  <script>
+    const btn = document.getElementById("generate-tts");
+    const textInput = document.getElementById("text-input");
+    const audioWrapper = document.getElementById("audio-wrapper");
+    const audioPlayer = document.getElementById("audio-player");
+    const statusEl = document.getElementById("status");
+
+    btn.addEventListener("click", async () => {
+      const text = textInput.value;
+
+      if (!text.trim()) {
+        alert("텍스트를 입력하세요!");
+        return;
+      }
+
+      statusEl.textContent = "TTS 생성 중입니다...";
+      btn.disabled = true;
+
+      try {
+        const response = await fetch("/tts/", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/x-www-form-urlencoded",
+          },
+          body: new URLSearchParams({ text }),
+        });
+
+        if (!response.ok) {
+          let error;
+          try {
+            error = await response.json();
+          } catch {
+            error = { detail: "알 수 없는 오류" };
+          }
+          alert(`TTS 생성 실패: ${error.detail}`);
+          statusEl.textContent = "TTS 생성에 실패했습니다.";
+          return;
+        }
+
+        const data = await response.json();
+        audioPlayer.src = data.file_path + "?v=" + new Date().getTime();
+        audioWrapper.style.display = "block";
+        audioPlayer.play();
+        statusEl.textContent = "TTS가 생성되었습니다. 아래 플레이어로 재생할 수 있습니다.";
+      } catch (error) {
+        console.error("에러 발생:", error);
+        alert("TTS 요청 중 문제가 발생했습니다.");
+        statusEl.textContent = "TTS 요청 중 오류가 발생했습니다.";
+      } finally {
+        btn.disabled = false;
+      }
+    });
+  </script>
+</body>
+</html>

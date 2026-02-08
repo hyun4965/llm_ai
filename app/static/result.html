@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>생성 결과 - 다국어 콘텐츠</title>
+    <link href="https://fonts.googleapis.com/css2?family=Pretendard:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #4f46e5;
+            --primary-hover: #4338ca;
+            --bg-color: #f9fafb;
+            --card-bg: #ffffff;
+            --text-main: #111827;
+            --text-sub: #6b7280;
+            --accent-bg: #f3f4f6;
+            --blue-bg: #eff6ff;
+        }
+
+        body {
+            font-family: 'Pretendard', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            margin: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+        }
+
+        .container {
+            width: 90%;
+            max-width: 600px;
+            background: var(--card-bg);
+            padding: 40px;
+            border-radius: 32px;
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05);
+            text-align: center;
+        }
+
+        h1 {
+            font-size: 2rem;
+            margin-bottom: 30px;
+        }
+
+        .result-section {
+            text-align: left;
+            margin-top: 24px;
+        }
+
+        label {
+            display: block;
+            font-weight: 700;
+            font-size: 0.9rem;
+            color: var(--text-main);
+            margin-bottom: 8px;
+            padding-left: 4px;
+        }
+
+        .content-box {
+            padding: 16px 20px;
+            border-radius: 16px;
+            line-height: 1.6;
+            font-size: 1rem;
+            word-break: break-all;
+            border: 1px solid transparent;
+        }
+
+        #source-text {
+            background-color: var(--accent-bg);
+            color: var(--text-sub);
+        }
+
+        #translated-text {
+            background-color: var(--blue-bg);
+            color: var(--primary-color);
+            font-weight: 600;
+            border: 1px solid #dbeafe;
+        }
+
+        .audio-wrapper {
+            margin-top: 30px;
+            padding: 20px;
+            background: #f8fafc;
+            border-radius: 20px;
+            border: 1px dashed #cbd5e1;
+        }
+
+        audio {
+            width: 100%;
+            margin-top: 10px;
+            height: 45px;
+        }
+
+        .btn {
+            display: block;
+            width: 100%;
+            padding: 16px;
+            margin-top: 40px;
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 14px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            text-decoration: none;
+        }
+
+        .btn:hover {
+            background-color: var(--primary-hover);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(79, 70, 229, 0.2);
+        }
+
+        .btn:active {
+            transform: translateY(0);
+        }
+
+        /* 이모지 애니메이션 */
+        .success-icon {
+            font-size: 3rem;
+            display: block;
+            margin-bottom: 10px;
+            animation: bounce 1s infinite;
+        }
+
+        @keyframes bounce {
+
+            0%,
+            100% {
+                transform: translateY(0);
+            }
+
+            50% {
+                transform: translateY(-10px);
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <span class="success-icon">🎉</span>
+        <h1>생성 완료!</h1>
+
+        <div class="result-section">
+            <label>원본 텍스트</label>
+            <div id="source-text" class="content-box">데이터를 불러오는 중...</div>
+        </div>
+
+        <div class="result-section">
+            <label>번역 및 변환 결과</label>
+            <div id="translated-text" class="content-box">데이터를 불러오는 중...</div>
+        </div>
+
+        <div class="result-section">
+            <label>나의 AI 목소리 들어보기</label>
+            <div class="audio-wrapper">
+                <audio id="result-audio" controls></audio>
+            </div>
+        </div>
+
+        <button onclick="location.href='/select.html'" class="btn">처음으로 돌아가기</button>
+    </div>
+
+    <script>
+        // sessionStorage에서 결과 데이터를 가져와서 화면에 뿌려줍니다.
+        const data = JSON.parse(sessionStorage.getItem("resultData"));
+        if (data) {
+            document.getElementById('source-text').textContent = data.source_text || "내용 없음";
+            document.getElementById('translated-text').textContent = data.translated_text || "내용 없음";
+            if (data.audio_url) {
+                document.getElementById('result-audio').src = data.audio_url + "?v=" + new Date().getTime();
+            }
+        } else {
+            document.querySelector('.container').innerHTML = `
+                <h1>데이터가 없습니다.</h1>
+                <button onclick="location.href='/select.html'" class="btn">돌아가기</button>
+            `;
+        }
+    </script>
+</body>
+
+</html>
