@@ -19,7 +19,7 @@ def generate_clone_voice(text: str, output_path: str):
     
     data = {
         "text": text,
-        "model_id": "eleven_multilingual_v2",  # 한국어 목소리로 영어 발화 가능
+        "model_id": "eleven_turbo_v2_5",  # 한국어 목소리로 영어 발화 가능
         "voice_settings": {
             "stability": 0.5,
             "similarity_boost": 0.8

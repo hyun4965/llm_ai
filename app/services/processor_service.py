@@ -12,7 +12,7 @@ def get_gpt_response(prompt):
     try:
         # ✅ 최신 방식의 API 호출
         response = client.chat.completions.create(
-            model="gpt-4o", # 또는 "gpt-3.5-turbo"
+            model="gpt-4o-mini", # 또는 "gpt-3.5-turbo"
             messages=[
                 {"role": "system", "content": "너는 전문 번역가야. 입력된 문장을 지정된 언어로 자연스럽게 번역해줘."},
                 {"role": "user", "content": prompt}

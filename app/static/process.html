@@ -11,7 +11,6 @@
     <style>
         :root {
             --primary-color: #4f46e5;
-            /* Indigo */
             --primary-hover: #4338ca;
             --danger-color: #ef4444;
             --bg-color: #f3f4f6;
@@ -204,7 +203,6 @@
             display: none;
         }
 
-        /* Animations */
         @keyframes fadeIn {
             from {
                 opacity: 0;
@@ -241,13 +239,48 @@
             <label><i class="fa-solid fa-language"></i>변환할 언어 선택</label>
             <div class="select-wrapper">
                 <select id="target-lang">
-                    <option value="en">🇺🇸 영어 (English)</option>
-                    <option value="ja">🇯🇵 일본어 (日本語)</option>
-                    <option value="zh">🇨🇳 중국어 (中文)</option>
-                    <option value="es">🇪🇸 스페인어 (Español)</option>
+                    <option value="" disabled selected>언어를 선택하세요</option>
+
+                    <option value="Korean">🇰🇷 Korean (한국어)</option>
+                    <option value="English">🇺🇸 English (영어)</option>
+                    <option value="Japanese">🇯🇵 Japanese (일본어)</option>
+                    <option value="Chinese">🇨🇳 Chinese (중국어)</option>
+
+                    <option value="Spanish">🇪🇸 Spanish (스페인어)</option>
+                    <option value="French">🇫🇷 French (프랑스어)</option>
+                    <option value="German">🇩🇪 German (독일어)</option>
+                    <option value="Italian">🇮🇹 Italian (이탈리아어)</option>
+                    <option value="Portuguese">🇵🇹 Portuguese (포르투갈어)</option>
+                    <option value="Russian">🇷🇺 Russian (러시아어)</option>
+                    <option value="Dutch">🇳🇱 Dutch (네덜란드어)</option>
+                    <option value="Polish">🇵🇱 Polish (폴란드어)</option>
+                    <option value="Turkish">🇹🇷 Turkish (튀르키예어)</option>
+                    <option value="Swedish">🇸🇪 Swedish (스웨덴어)</option>
+                    <option value="Greek">🇬🇷 Greek (그리스어)</option>
+
+                    <option value="Hindi">🇮🇳 Hindi (힌디어)</option>
+                    <option value="Vietnamese">🇻🇳 Vietnamese (베트남어)</option>
+                    <option value="Indonesian">🇮🇩 Indonesian (인도네시아어)</option>
+                    <option value="Thai">🇹🇭 Thai (태국어)</option>
+                    <option value="Arabic">🇸🇦 Arabic (아랍어)</option>
                 </select>
                 <div class="select-arrow"><i class="fa-solid fa-chevron-down"></i></div>
             </div>
+        </div>
+
+        <div class="input-group">
+            <label><i class="fa-solid fa-book-open"></i>도메인 지식 참고 (선택)</label>
+            <div class="select-wrapper">
+                <select id="domain-select">
+                    <option value="none" selected>없음</option>
+                    <option value="ai">🤖 IT / AI 전문 지식</option>
+                    <option value="clothing">👕 의류 / 패션 지식</option>
+                    <option value="database">💾 데이터베이스</option>
+                    <option value="cloud">☁️ 클라우드</option>
+                </select>
+                <div class="select-arrow"><i class="fa-solid fa-chevron-down"></i></div>
+            </div>
+            <p class="helper-text" style="margin-top:8px;">전문 용어 사전을 참고하여 더 정확하게 번역합니다.</p>
         </div>
 
         <div id="record-area" class="input-group hidden">
@@ -281,7 +314,7 @@
         const statusEl = document.getElementById('status');
         const modeTitle = document.getElementById('mode-title');
 
-        // 1. 모드에 따른 UI 노출 및 제목 설정
+        // 1. 모드 UI 설정
         if (mode === 'record') {
             document.getElementById('record-area').classList.remove('hidden');
             modeTitle.innerHTML = '<i class="fa-solid fa-microphone-lines"></i> 음성 복제 및 번역';
@@ -292,7 +325,6 @@
             document.getElementById('text-area').classList.remove('hidden');
             modeTitle.innerHTML = '<i class="fa-solid fa-keyboard"></i> 텍스트 음성 변환';
         } else {
-            // 모드가 없을 경우 기본 처리 (예: 텍스트 모드)
             document.getElementById('text-area').classList.remove('hidden');
         }
 
@@ -305,7 +337,6 @@
 
         recordBtn.onclick = async () => {
             if (!recordBtn.classList.contains("recording")) {
-                // 녹음 시작
                 try {
                     const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
                     mediaRecorder = new MediaRecorder(stream);
@@ -313,7 +344,6 @@
                     mediaRecorder.ondataavailable = e => audioChunks.push(e.data);
                     mediaRecorder.start();
 
-                    // UI 업데이트
                     recordBtn.classList.add("recording");
                     recordBtnText.textContent = "녹음 중지";
                     recordBtnIcon.className = "fa-solid fa-stop";
@@ -322,10 +352,7 @@
                     alert("마이크 접근 권한이 필요합니다.");
                 }
             } else {
-                // 녹음 중지
                 mediaRecorder.stop();
-
-                // UI 업데이트
                 recordBtn.classList.remove("recording");
                 recordBtnText.textContent = "다시 녹음하기";
                 recordBtnIcon.className = "fa-solid fa-rotate-right";
@@ -336,11 +363,16 @@
         // 3. 서버 전송 로직
         document.getElementById('submitBtn').onclick = async () => {
             const lang = document.getElementById('target-lang').value;
+            // 도메인 값 가져오기
+            const domain = document.getElementById('domain-select').value;
+
+            if (!lang) return alert("언어를 선택해주세요!");
+
             const formData = new FormData();
             formData.append("target_lang", lang);
             formData.append("mode", mode);
+            formData.append("domain", domain);
 
-            // 유효성 검사 및 데이터 추가
             if (mode === 'record') {
                 if (audioChunks.length === 0) return alert("먼저 녹음을 진행해 주세요!");
                 const blob = new Blob(audioChunks, { type: 'audio/webm' });
@@ -355,7 +387,6 @@
                 formData.append("text", text);
             }
 
-            // 로딩 상태 표시
             statusEl.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> AI가 콘텐츠를 생성하고 있습니다...';
             document.getElementById('submitBtn').disabled = true;
             document.getElementById('submitBtn').style.opacity = "0.7";
@@ -364,7 +395,6 @@
                 const res = await fetch("/api/generate-content", { method: "POST", body: formData });
                 const data = await res.json();
 
-                // 성공 시
                 sessionStorage.setItem("resultData", JSON.stringify(data));
                 location.href = "/result.html";
             } catch (e) {

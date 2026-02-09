@@ -4,18 +4,17 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>생성 결과 - 다국어 콘텐츠</title>
+    <title>AI 생성 결과 확인</title>
     <link href="https://fonts.googleapis.com/css2?family=Pretendard:wght@400;600;700&display=swap" rel="stylesheet">
     <style>
         :root {
             --primary-color: #4f46e5;
-            --primary-hover: #4338ca;
-            --bg-color: #f9fafb;
+            --bg-color: #f3f4f6;
             --card-bg: #ffffff;
             --text-main: #111827;
             --text-sub: #6b7280;
-            --accent-bg: #f3f4f6;
-            --blue-bg: #eff6ff;
+            --border-color: #e5e7eb;
+            --arrow-color: #cbd5e1;
         }
 
         body {
@@ -27,159 +26,216 @@
             align-items: center;
             justify-content: center;
             min-height: 100vh;
+            padding: 20px;
         }
 
         .container {
-            width: 90%;
-            max-width: 600px;
+            width: 100%;
+            max-width: 500px;
             background: var(--card-bg);
-            padding: 40px;
-            border-radius: 32px;
-            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05);
-            text-align: center;
+            padding: 30px;
+            border-radius: 24px;
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
         }
 
-        h1 {
-            font-size: 2rem;
+        .header {
+            text-align: center;
             margin-bottom: 30px;
         }
 
-        .result-section {
-            text-align: left;
-            margin-top: 24px;
+        .header h1 {
+            font-size: 1.5rem;
+            margin: 5px 0;
         }
 
-        label {
-            display: block;
-            font-weight: 700;
-            font-size: 0.9rem;
-            color: var(--text-main);
-            margin-bottom: 8px;
-            padding-left: 4px;
-        }
-
-        .content-box {
-            padding: 16px 20px;
+        /* 3단 박스 스타일 */
+        .step-box {
+            position: relative;
+            background: #fff;
+            border: 1px solid var(--border-color);
             border-radius: 16px;
-            line-height: 1.6;
-            font-size: 1rem;
-            word-break: break-all;
-            border: 1px solid transparent;
+            padding: 16px;
+            margin-bottom: 24px;
+            transition: all 0.2s;
         }
 
-        #source-text {
-            background-color: var(--accent-bg);
-            color: var(--text-sub);
+        .step-box:hover {
+            border-color: var(--primary-color);
+            box-shadow: 0 4px 12px rgba(79, 70, 229, 0.1);
         }
 
-        #translated-text {
-            background-color: var(--blue-bg);
-            color: var(--primary-color);
-            font-weight: 600;
-            border: 1px solid #dbeafe;
-        }
-
-        .audio-wrapper {
-            margin-top: 30px;
-            padding: 20px;
-            background: #f8fafc;
+        /* 라벨 (배지) 스타일 */
+        .step-label {
+            display: inline-flex;
+            align-items: center;
+            font-size: 0.8rem;
+            font-weight: 700;
+            padding: 4px 10px;
             border-radius: 20px;
-            border: 1px dashed #cbd5e1;
+            margin-bottom: 10px;
+        }
+
+        /* 각 단계별 색상 */
+        .label-orig {
+            background: #f3f4f6;
+            color: #374151;
+        }
+
+        /* 회색 */
+        .label-trans {
+            background: #e0e7ff;
+            color: #4338ca;
+        }
+
+        /* 파란색 (메인) */
+        .label-check {
+            background: #fff1f2;
+            color: #be123c;
+        }
+
+        /* 빨간색 (검증) */
+
+        .text-content {
+            font-size: 1.05rem;
+            line-height: 1.5;
+            color: var(--text-main);
+            word-break: keep-all;
+        }
+
+        /* 화살표 아이콘 */
+        .arrow-down {
+            text-align: center;
+            color: var(--arrow-color);
+            font-size: 1.2rem;
+            margin: -15px 0 10px 0;
+            font-weight: bold;
+        }
+
+        /* 오디오 플레이어 */
+        .audio-wrapper {
+            margin-top: 20px;
+            padding: 15px;
+            background: #f8fafc;
+            border-radius: 12px;
+            text-align: center;
         }
 
         audio {
             width: 100%;
-            margin-top: 10px;
-            height: 45px;
+            height: 40px;
         }
 
         .btn {
             display: block;
             width: 100%;
-            padding: 16px;
-            margin-top: 40px;
+            padding: 14px;
+            margin-top: 20px;
             background-color: var(--primary-color);
             color: white;
             border: none;
-            border-radius: 14px;
-            font-size: 1.1rem;
+            border-radius: 12px;
+            font-size: 1rem;
             font-weight: 600;
             cursor: pointer;
-            transition: all 0.2s;
-            text-decoration: none;
-        }
-
-        .btn:hover {
-            background-color: var(--primary-hover);
-            transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(79, 70, 229, 0.2);
-        }
-
-        .btn:active {
-            transform: translateY(0);
-        }
-
-        /* 이모지 애니메이션 */
-        .success-icon {
-            font-size: 3rem;
-            display: block;
-            margin-bottom: 10px;
-            animation: bounce 1s infinite;
-        }
-
-        @keyframes bounce {
-
-            0%,
-            100% {
-                transform: translateY(0);
-            }
-
-            50% {
-                transform: translateY(-10px);
-            }
         }
     </style>
 </head>
 
 <body>
     <div class="container">
-        <span class="success-icon">🎉</span>
-        <h1>생성 완료!</h1>
-
-        <div class="result-section">
-            <label>원본 텍스트</label>
-            <div id="source-text" class="content-box">데이터를 불러오는 중...</div>
+        <div class="header">
+            <span>🎉</span>
+            <h1>결과 리포트</h1>
         </div>
 
-        <div class="result-section">
-            <label>번역 및 변환 결과</label>
-            <div id="translated-text" class="content-box">데이터를 불러오는 중...</div>
+        <div class="step-box">
+            <span class="step-label label-orig">1. 원본 (Original) 🇰🇷</span>
+            <div id="source-text" class="text-content">로딩 중...</div>
         </div>
 
-        <div class="result-section">
-            <label>나의 AI 목소리 들어보기</label>
-            <div class="audio-wrapper">
-                <audio id="result-audio" controls></audio>
+        <div class="arrow-down">↓</div>
+
+        <div class="step-box" style="border-color: #818cf8; background-color: #f5f7ff;">
+            <span id="target-badge" class="step-label label-trans">2. 번역 결과</span>
+            <div id="translated-text" class="text-content" style="font-weight: 600;">로딩 중...</div>
+        </div>
+
+        <div class="arrow-down">↓</div>
+
+        <div class="step-box">
+            <span class="step-label label-check">3. 의미 확인 (Back-Translation) 🇰🇷</span>
+            <div id="check-text" class="text-content" style="color: #4b5563;">
+                로딩 중...
             </div>
+            <p style="font-size: 0.75rem; color: #9ca3af; margin-top:8px;">
+                * 위 번역 결과(2번)를 다시 한국어로 직역한 내용입니다. 1번과 의미가 같은지 확인하세요.
+            </p>
+        </div>
+
+        <div class="audio-wrapper">
+            <div style="font-size:0.9rem; font-weight:600; margin-bottom:8px;">🎧 AI 목소리 듣기</div>
+            <audio id="result-audio" controls></audio>
         </div>
 
         <button onclick="location.href='/select.html'" class="btn">처음으로 돌아가기</button>
     </div>
 
     <script>
-        // sessionStorage에서 결과 데이터를 가져와서 화면에 뿌려줍니다.
+        // 언어 배지 정보 (20개 국어 매핑)
+        function getLangInfo(lang) {
+            const map = {
+                'Korean': '🇰🇷 한국어',
+                'English': '🇺🇸 English',
+                'Japanese': '🇯🇵 日本語',
+                'Chinese': '🇨🇳 中文',
+                'Spanish': '🇪🇸 Español',
+                'French': '🇫🇷 Français',
+                'German': '🇩🇪 Deutsch',
+                'Italian': '🇮🇹 Italiano',
+                'Portuguese': '🇵🇹 Português',
+                'Russian': '🇷🇺 Русский',
+                'Dutch': '🇳🇱 Nederlands',
+                'Polish': '🇵🇱 Polski',
+                'Turkish': '🇹🇷 Türkçe',
+                'Swedish': '🇸🇪 Svenska',
+                'Greek': '🇬🇷 Ελληνικά',
+                'Hindi': '🇮🇳 हिन्दी',
+                'Vietnamese': '🇻🇳 Tiếng Việt',
+                'Indonesian': '🇮🇩 Bahasa Indonesia',
+                'Thai': '🇹🇭 ภาษาไทย',
+                'Arabic': '🇸🇦 العربية'
+            };
+            return map[lang] || lang;
+        }
+
         const data = JSON.parse(sessionStorage.getItem("resultData"));
+
         if (data) {
-            document.getElementById('source-text').textContent = data.source_text || "내용 없음";
-            document.getElementById('translated-text').textContent = data.translated_text || "내용 없음";
+            // 1. 원본
+            document.getElementById('source-text').innerText = data.source_text || "내용 없음";
+
+            // 2. 번역 결과
+            document.getElementById('translated-text').innerText = data.translated_text || "내용 없음";
+
+            // 배지 업데이트
+            if (data.target_lang) {
+                document.getElementById('target-badge').innerText = `2. 번역 결과 (${getLangInfo(data.target_lang)})`;
+            }
+
+            // 3. 재번역 결과
+            if (data.back_translated_text) {
+                document.getElementById('check-text').innerText = data.back_translated_text;
+            } else {
+                document.getElementById('check-text').innerText = "검증 데이터 없음";
+            }
+
+            // 오디오
             if (data.audio_url) {
-                document.getElementById('result-audio').src = data.audio_url + "?v=" + new Date().getTime();
+                document.getElementById('result-audio').src = data.audio_url + "?t=" + new Date().getTime();
             }
         } else {
-            document.querySelector('.container').innerHTML = `
-                <h1>데이터가 없습니다.</h1>
-                <button onclick="location.href='/select.html'" class="btn">돌아가기</button>
-            `;
+            alert("데이터가 없습니다.");
+            location.href = '/select.html';
         }
     </script>
 </body>
