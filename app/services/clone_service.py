@@ -1,104 +1,87 @@
 import os
-import uuid
-import requests
 import json
+import requests
+import uuid
 from dotenv import load_dotenv
 
 load_dotenv()
 
-# 환경 변수에서 키 가져오기
 ELEVENLABS_API_KEY = os.getenv("ELEVENLABS_API_KEY")
+VOICE_DB_FILE = "user_voice_map.json"
 
-def clone_voice_and_save(text: str, language: str, speaker_wav: str, output_path: str):
+def _load_voice_db():
+    if os.path.exists(VOICE_DB_FILE):
+        with open(VOICE_DB_FILE, "r", encoding="utf-8") as f:
+            return json.load(f)
+    return {}
+
+def _save_voice_db(data):
+    with open(VOICE_DB_FILE, "w", encoding="utf-8") as f:
+        json.dump(data, f, ensure_ascii=False, indent=2)
+
+def get_or_create_voice_id(user_id: str, speaker_wav: str) -> str:
     """
-    [Starter 유료 플랜용] 
-    1. 내 목소리(speaker_wav)를 일레븐랩스에 등록 (Instant Cloning)
-    2. 그 목소리로 텍스트 읽기 (TTS)
-    3. 슬롯 확보를 위해 목소리 삭제 (Delete)
+    [기존과 동일] Voice ID 조회 또는 생성
     """
-    
-    # API 키 확인
     if not ELEVENLABS_API_KEY:
         raise ValueError("ELEVENLABS_API_KEY가 설정되지 않았습니다.")
 
+    headers = {"xi-api-key": ELEVENLABS_API_KEY}
+    
+    db = _load_voice_db()
+    if user_id in db:
+        voice_id = db[user_id]
+        print(f"♻️ 기존 Voice ID 재사용: {voice_id}")
+        return voice_id
+
+    print(f"🆕 새 목소리 등록 요청 중... ({os.path.basename(speaker_wav)})")
+    add_url = "https://api.elevenlabs.io/v1/voices/add"
+    voice_name = f"User_{user_id}_{uuid.uuid4().hex[:4]}"
+
+    with open(speaker_wav, "rb") as f:
+        files = {'files': (os.path.basename(speaker_wav), f, 'audio/wav')}
+        data = {'name': voice_name, 'description': 'FastAPI Auto Clone'}
+        response = requests.post(add_url, headers=headers, data=data, files=files)
+    
+    if response.status_code != 200:
+        raise Exception(f"목소리 등록 실패: {response.text}")
+    
+    voice_id = response.json().get("voice_id")
+    print(f"목소리 등록 완료! ID: {voice_id}")
+
+    db[user_id] = voice_id
+    _save_voice_db(db)
+    
+    return voice_id
+
+def generate_speech_stream(text: str, voice_id: str):
+    """
+    [핵심 수정] 파일 저장이 아닌, 오디오 데이터 조각(chunk)을 실시간으로 반환(yield)
+    """
     headers = {
-        "xi-api-key": ELEVENLABS_API_KEY
+        "xi-api-key": ELEVENLABS_API_KEY,
+        "Content-Type": "application/json"
     }
 
-    voice_id = None
-    
-    try:
-        # 1. 목소리 등록 (Add Voice) - 복제 시작
-        print(f"일레븐랩스 API로 내 목소리 등록 요청 중... ({os.path.basename(speaker_wav)})")
-        
-        add_url = "https://api.elevenlabs.io/v1/voices/add"
-        
-        # 임시 이름 생성
-        temp_name = f"MyVoice_{uuid.uuid4().hex[:8]}"
-        
-        # 파일 전송
-        with open(speaker_wav, "rb") as f:
-            files = {
-                'files': (os.path.basename(speaker_wav), f, 'audio/wav')
-            }
-            data = {
-                'name': temp_name,
-                'description': 'FastAPI Cloned Voice'
-            }
-            
-            response = requests.post(add_url, headers=headers, data=data, files=files)
-            
-        if response.status_code != 200:
-            raise Exception(f"목소리 등록 실패(결제 확인 필요): {response.text}")
-            
-        # 응답에서 voice_id 추출
-        voice_id = response.json().get("voice_id")
-        print(f"목소리 등록 완료! ID: {voice_id}")
+    # optimize_streaming_latency=3 : 지연 시간 최소화 옵션
+    generate_url = f"https://api.elevenlabs.io/v1/text-to-speech/{voice_id}/stream?optimize_streaming_latency=3"
 
-        # 2. 오디오 생성 (Text to Speech)
-        print(f"내 목소리로 오디오 생성 시작... (내용: {text[:15]}...)")
-        
-        generate_url = f"https://api.elevenlabs.io/v1/text-to-speech/{voice_id}/stream"
-        
-        # JSON 요청 헤더
-        gen_headers = headers.copy()
-        gen_headers["Content-Type"] = "application/json"
-        
-        payload = {
-            "text": text,
-            "model_id": "eleven_multilingual_v2", # 한국어 지원 모델
-            "voice_settings": {
-                "stability": 0.5,       # 0.5가 가장 자연스러움
-                "similarity_boost": 0.75 # 0.75 이상이면 목소리가 매우 비슷해짐
-            }
+    payload = {
+        "text": text,
+        "model_id": "eleven_turbo_v2_5",  # Turbo 모델 (속도 최우선)
+        "voice_settings": {
+            "stability": 0.5,
+            "similarity_boost": 0.75
         }
-        
-        # 스트리밍 요청
-        gen_response = requests.post(generate_url, headers=gen_headers, json=payload, stream=True)
-        
-        if gen_response.status_code != 200:
-            raise Exception(f"오디오 생성 실패: {gen_response.text}")
+    }
 
-        # 파일 저장
-        with open(output_path, "wb") as f:
-            for chunk in gen_response.iter_content(chunk_size=1024):
-                if chunk:
-                    f.write(chunk)
-                    
-        print(f"파일 저장 완료: {output_path}")
-        return output_path
+    # stream=True 필수
+    response = requests.post(generate_url, headers=headers, json=payload, stream=True)
 
-    except Exception as e:
-        print(f"오류 발생: {e}")
-        raise e
+    if response.status_code != 200:
+        raise Exception(f"ElevenLabs API Error: {response.text}")
 
-    finally:
-        # 3. 목소리 삭제 (Delete Voice)
-        # Starter 플랜은 슬롯이 10개이므로 다 쓰지 않게 관리해야 함
-        if voice_id:
-            try:
-                delete_url = f"https://api.elevenlabs.io/v1/voices/{voice_id}"
-                del_response = requests.delete(delete_url, headers=headers)
-                print(f"임시 목소리 삭제 완료 (슬롯 반환)")
-            except Exception as e:
-                print(f"목소리 삭제 실패 (수동 삭제 필요): {e}")
+    # 청크 단위로 데이터를 즉시 반환
+    for chunk in response.iter_content(chunk_size=1024):
+        if chunk:
+            yield chunk

@@ -9,6 +9,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
     <style>
+        /* [공통 변수] */
         :root {
             --primary-color: #4f46e5;
             --primary-hover: #4338ca;
@@ -18,13 +19,14 @@
             --text-main: #1f2937;
             --text-sub: #6b7280;
             --border-color: #e5e7eb;
+            --arrow-color: #cbd5e1;
         }
 
         * {
             box-sizing: border-box;
             margin: 0;
             padding: 0;
-            font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, system-ui, Roboto, sans-serif;
+            font-family: 'Pretendard', sans-serif;
         }
 
         body {
@@ -39,13 +41,15 @@
         .container {
             background: var(--card-bg);
             width: 100%;
-            max-width: 480px;
+            max-width: 500px;
+            /* result.html 너비에 맞춤 */
             padding: 40px;
             border-radius: 24px;
-            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
-            transition: transform 0.3s ease;
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
         }
 
+        /* --- [페이지 1: 입력 화면 스타일] --- */
         h1 {
             font-size: 24px;
             font-weight: 700;
@@ -77,7 +81,7 @@
             margin-right: 6px;
         }
 
-        /* Select Box Styling */
+        /* Select & Input */
         .select-wrapper {
             position: relative;
         }
@@ -89,14 +93,12 @@
             border: 2px solid var(--border-color);
             border-radius: 12px;
             background-color: #fff;
-            color: var(--text-main);
             appearance: none;
             cursor: pointer;
-            transition: border-color 0.2s;
+            outline: none;
         }
 
         select:focus {
-            outline: none;
             border-color: var(--primary-color);
         }
 
@@ -109,24 +111,21 @@
             color: var(--text-sub);
         }
 
-        /* Text Area */
         textarea {
             width: 100%;
             padding: 14px;
             font-size: 16px;
+            height: 120px;
             border: 2px solid var(--border-color);
             border-radius: 12px;
             resize: none;
             outline: none;
-            transition: border-color 0.2s;
-            height: 120px;
         }
 
         textarea:focus {
             border-color: var(--primary-color);
         }
 
-        /* File Input */
         input[type="file"] {
             width: 100%;
             padding: 10px;
@@ -145,20 +144,16 @@
             font-size: 16px;
             font-weight: 600;
             cursor: pointer;
-            transition: all 0.2s ease;
             display: flex;
             justify-content: center;
             align-items: center;
             gap: 8px;
+            transition: all 0.2s ease;
         }
 
         #recordBtn {
             background-color: #e0e7ff;
             color: var(--primary-color);
-        }
-
-        #recordBtn:hover {
-            background-color: #c7d2fe;
         }
 
         #recordBtn.recording {
@@ -174,16 +169,6 @@
             box-shadow: 0 4px 12px rgba(79, 70, 229, 0.3);
         }
 
-        #submitBtn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 15px rgba(79, 70, 229, 0.4);
-        }
-
-        #submitBtn:active {
-            transform: translateY(0);
-        }
-
-        /* Status & Helper Text */
         .helper-text {
             font-size: 13px;
             color: var(--text-sub);
@@ -199,6 +184,76 @@
             min-height: 20px;
         }
 
+        /* --- [페이지 2: 결과 화면 스타일 (Result.html 디자인)] --- */
+        .step-box {
+            position: relative;
+            background: #fff;
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 16px;
+            margin-bottom: 24px;
+            transition: all 0.2s;
+        }
+
+        .step-box:hover {
+            border-color: var(--primary-color);
+            box-shadow: 0 4px 12px rgba(79, 70, 229, 0.1);
+        }
+
+        .step-label {
+            display: inline-flex;
+            align-items: center;
+            font-size: 0.8rem;
+            font-weight: 700;
+            padding: 4px 10px;
+            border-radius: 20px;
+            margin-bottom: 10px;
+        }
+
+        .label-orig {
+            background: #f3f4f6;
+            color: #374151;
+        }
+
+        .label-trans {
+            background: #e0e7ff;
+            color: #4338ca;
+        }
+
+        .label-check {
+            background: #fff1f2;
+            color: #be123c;
+        }
+
+        .text-content {
+            font-size: 1.05rem;
+            line-height: 1.5;
+            color: var(--text-main);
+            word-break: keep-all;
+        }
+
+        .arrow-down {
+            text-align: center;
+            color: var(--arrow-color);
+            font-size: 1.2rem;
+            margin: -15px 0 10px 0;
+            font-weight: bold;
+        }
+
+        .audio-wrapper {
+            margin-top: 20px;
+            padding: 15px;
+            background: #f8fafc;
+            border-radius: 12px;
+            text-align: center;
+        }
+
+        audio {
+            width: 100%;
+            height: 40px;
+        }
+
+        /* 유틸리티 */
         .hidden {
             display: none;
         }
@@ -233,139 +288,172 @@
 
 <body>
     <div class="container">
-        <h1 id="mode-title"><i class="fa-solid fa-wand-magic-sparkles"></i>기능 수행</h1>
 
-        <div class="input-group">
-            <label><i class="fa-solid fa-language"></i>변환할 언어 선택</label>
-            <div class="select-wrapper">
-                <select id="target-lang">
-                    <option value="" disabled selected>언어를 선택하세요</option>
+        <div id="view-input">
+            <h1 id="mode-title"><i class="fa-solid fa-wand-magic-sparkles"></i>기능 수행</h1>
 
-                    <option value="Korean">🇰🇷 Korean (한국어)</option>
-                    <option value="English">🇺🇸 English (영어)</option>
-                    <option value="Japanese">🇯🇵 Japanese (일본어)</option>
-                    <option value="Chinese">🇨🇳 Chinese (중국어)</option>
+            <div class="input-group">
+                <label><i class="fa-solid fa-language"></i>변환할 언어 선택</label>
+                <div class="select-wrapper">
+                    <select id="target-lang">
+                        <option value="English">🇺🇸 English (영어)</option>
+                        <option value="Japanese">🇯🇵 Japanese (일본어)</option>
+                        <option value="Chinese">🇨🇳 Chinese (중국어)</option>
+                        <option value="Korean">🇰🇷 Korean (한국어)</option>
 
-                    <option value="Spanish">🇪🇸 Spanish (스페인어)</option>
-                    <option value="French">🇫🇷 French (프랑스어)</option>
-                    <option value="German">🇩🇪 German (독일어)</option>
-                    <option value="Italian">🇮🇹 Italian (이탈리아어)</option>
-                    <option value="Portuguese">🇵🇹 Portuguese (포르투갈어)</option>
-                    <option value="Russian">🇷🇺 Russian (러시아어)</option>
-                    <option value="Dutch">🇳🇱 Dutch (네덜란드어)</option>
-                    <option value="Polish">🇵🇱 Polish (폴란드어)</option>
-                    <option value="Turkish">🇹🇷 Turkish (튀르키예어)</option>
-                    <option value="Swedish">🇸🇪 Swedish (스웨덴어)</option>
-                    <option value="Greek">🇬🇷 Greek (그리스어)</option>
+                        <option value="Spanish">🇪🇸 Spanish (스페인어)</option>
+                        <option value="French">🇫🇷 French (프랑스어)</option>
+                        <option value="German">🇩🇪 German (독일어)</option>
+                        <option value="Italian">🇮🇹 Italian (이탈리아어)</option>
+                        <option value="Portuguese">🇵🇹 Portuguese (포르투갈어)</option>
+                        <option value="Russian">🇷🇺 Russian (러시아어)</option>
+                        <option value="Dutch">🇳🇱 Dutch (네덜란드어)</option>
+                        <option value="Polish">🇵🇱 Polish (폴란드어)</option>
+                        <option value="Turkish">🇹🇷 Turkish (튀르키예어)</option>
+                        <option value="Swedish">🇸🇪 Swedish (스웨덴어)</option>
+                        <option value="Greek">🇬🇷 Greek (그리스어)</option>
 
-                    <option value="Hindi">🇮🇳 Hindi (힌디어)</option>
-                    <option value="Vietnamese">🇻🇳 Vietnamese (베트남어)</option>
-                    <option value="Indonesian">🇮🇩 Indonesian (인도네시아어)</option>
-                    <option value="Thai">🇹🇭 Thai (태국어)</option>
-                    <option value="Arabic">🇸🇦 Arabic (아랍어)</option>
-                </select>
-                <div class="select-arrow"><i class="fa-solid fa-chevron-down"></i></div>
+                        <option value="Vietnamese">🇻🇳 Vietnamese (베트남어)</option>
+                        <option value="Indonesian">🇮🇩 Indonesian (인도네시아어)</option>
+                        <option value="Thai">🇹🇭 Thai (태국어)</option>
+                        <option value="Hindi">🇮🇳 Hindi (힌디어)</option>
+                        <option value="Arabic">🇸🇦 Arabic (아랍어)</option>
+                    </select>
+                    <div class="select-arrow"><i class="fa-solid fa-chevron-down"></i></div>
+                </div>
             </div>
-        </div>
 
-        <div class="input-group">
-            <label><i class="fa-solid fa-book-open"></i>도메인 지식 참고 (선택)</label>
-            <div class="select-wrapper">
-                <select id="domain-select">
-                    <option value="none" selected>없음</option>
-                    <option value="ai">🤖 IT / AI 전문 지식</option>
-                    <option value="clothing">👕 의류 / 패션 지식</option>
-                    <option value="database">💾 데이터베이스</option>
-                    <option value="cloud">☁️ 클라우드</option>
-                </select>
-                <div class="select-arrow"><i class="fa-solid fa-chevron-down"></i></div>
+            <div class="input-group">
+                <label><i class="fa-solid fa-book-open"></i>도메인 지식 참고 (선택)</label>
+                <div class="select-wrapper">
+                    <select id="domain-select">
+                        <option value="none" selected>없음</option>
+                        <option value="ai">🤖 IT / AI 전문 지식</option>
+                        <option value="clothing">👕 의류 / 패션 지식</option>
+                        <option value="database">💾 데이터베이스</option>
+                        <option value="cloud">☁️ 클라우드</option>
+                    </select>
+                    <div class="select-arrow"><i class="fa-solid fa-chevron-down"></i></div>
+                </div>
             </div>
-            <p class="helper-text" style="margin-top:8px;">전문 용어 사전을 참고하여 더 정확하게 번역합니다.</p>
-        </div>
 
-        <div id="record-area" class="input-group hidden">
-            <label><i class="fa-solid fa-microphone-lines"></i>음성 녹음</label>
-            <p class="helper-text">목소리를 10초 내외로 선명하게 녹음해 주세요.</p>
-            <button id="recordBtn" class="btn">
-                <i class="fa-solid fa-microphone"></i> <span>녹음 시작</span>
+            <div id="record-area" class="input-group hidden">
+                <label><i class="fa-solid fa-microphone-lines"></i>음성 녹음</label>
+                <p class="helper-text">목소리를 10초 내외로 선명하게 녹음해 주세요.</p>
+                <button id="recordBtn" class="btn">
+                    <i class="fa-solid fa-microphone"></i> <span>녹음 시작</span>
+                </button>
+            </div>
+
+            <div id="upload-area" class="input-group hidden">
+                <label><i class="fa-solid fa-cloud-arrow-up"></i>음성 파일 업로드</label>
+                <input type="file" id="audio-file" accept="audio/*">
+            </div>
+
+            <div id="text-area" class="input-group hidden">
+                <label><i class="fa-solid fa-keyboard"></i>텍스트 입력</label>
+                <textarea id="text-input" placeholder="AI가 변환할 대본을 여기에 입력하세요..."></textarea>
+            </div>
+
+            <div id="status"></div>
+            <button id="submitBtn" class="btn">
+                <span>AI 콘텐츠 생성 시작</span> <i class="fa-solid fa-rocket"></i>
             </button>
         </div>
 
-        <div id="upload-area" class="input-group hidden">
-            <label><i class="fa-solid fa-cloud-arrow-up"></i>음성 파일 업로드</label>
-            <p class="helper-text">MP3, WAV, M4A 등 오디오 파일을 선택하세요.</p>
-            <input type="file" id="audio-file" accept="audio/*">
+        <div id="view-result" class="hidden">
+            <div style="text-align: center; margin-bottom: 30px;">
+                <span style="font-size: 2rem;">🎉</span>
+                <h1>결과 리포트</h1>
+            </div>
+
+            <div class="step-box">
+                <span class="step-label label-orig">1. 원본 (Original)</span>
+                <div id="res-source" class="text-content">로딩 중...</div>
+            </div>
+
+            <div class="arrow-down">↓</div>
+
+            <div class="step-box" style="border-color: #818cf8; background-color: #f5f7ff;">
+                <span id="target-badge" class="step-label label-trans">2. 번역 결과</span>
+                <div id="res-translated" class="text-content" style="font-weight: 600;">로딩 중...</div>
+            </div>
+
+            <div class="arrow-down">↓</div>
+
+            <div class="step-box">
+                <span class="step-label label-check">3. 의미 확인 (Back-Translation)</span>
+                <div id="res-check" class="text-content" style="color: #4b5563;">검증 생략</div>
+                <p style="font-size: 0.75rem; color: #9ca3af; margin-top:8px;">* 번역 결과를 다시 한국어로 직역한 내용입니다.</p>
+            </div>
+
+            <div class="audio-wrapper">
+                <div style="font-size:0.9rem; font-weight:600; margin-bottom:8px;">🎧 AI 목소리 듣기</div>
+                <audio id="result-audio" controls autoplay></audio>
+            </div>
+
+            <button onclick="location.reload()" class="btn" style="margin-top:20px;">
+                <i class="fa-solid fa-rotate-left"></i> 처음으로 돌아가기
+            </button>
         </div>
 
-        <div id="text-area" class="input-group hidden">
-            <label><i class="fa-solid fa-keyboard"></i>텍스트 입력</label>
-            <textarea id="text-input" placeholder="AI가 변환할 대본을 여기에 입력하세요..."></textarea>
-        </div>
-
-        <div id="status"></div>
-        <button id="submitBtn" class="btn">
-            <span>AI 콘텐츠 생성 시작</span> <i class="fa-solid fa-rocket"></i>
-        </button>
     </div>
 
     <script>
         const urlParams = new URLSearchParams(window.location.search);
-        const mode = urlParams.get('mode');
+        const mode = urlParams.get('mode') || 'text';
+
+        const viewInput = document.getElementById('view-input');
+        const viewResult = document.getElementById('view-result');
         const statusEl = document.getElementById('status');
         const modeTitle = document.getElementById('mode-title');
 
-        // 1. 모드 UI 설정
+        // [UI 초기화]
         if (mode === 'record') {
             document.getElementById('record-area').classList.remove('hidden');
             modeTitle.innerHTML = '<i class="fa-solid fa-microphone-lines"></i> 음성 복제 및 번역';
         } else if (mode === 'upload') {
             document.getElementById('upload-area').classList.remove('hidden');
             modeTitle.innerHTML = '<i class="fa-solid fa-file-audio"></i> 오디오 번역';
-        } else if (mode === 'text') {
-            document.getElementById('text-area').classList.remove('hidden');
-            modeTitle.innerHTML = '<i class="fa-solid fa-keyboard"></i> 텍스트 음성 변환';
         } else {
             document.getElementById('text-area').classList.remove('hidden');
+            modeTitle.innerHTML = '<i class="fa-solid fa-keyboard"></i> 텍스트 음성 변환';
         }
 
-        // 2. 녹음 로직
+        // [녹음 로직]
         let mediaRecorder;
         let audioChunks = [];
         const recordBtn = document.getElementById('recordBtn');
-        const recordBtnText = recordBtn.querySelector('span');
-        const recordBtnIcon = recordBtn.querySelector('i');
 
-        recordBtn.onclick = async () => {
-            if (!recordBtn.classList.contains("recording")) {
-                try {
-                    const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-                    mediaRecorder = new MediaRecorder(stream);
-                    audioChunks = [];
-                    mediaRecorder.ondataavailable = e => audioChunks.push(e.data);
-                    mediaRecorder.start();
+        if (recordBtn) {
+            recordBtn.onclick = async () => {
+                if (!recordBtn.classList.contains("recording")) {
+                    try {
+                        const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+                        mediaRecorder = new MediaRecorder(stream);
+                        audioChunks = [];
+                        mediaRecorder.ondataavailable = e => audioChunks.push(e.data);
+                        mediaRecorder.start();
 
-                    recordBtn.classList.add("recording");
-                    recordBtnText.textContent = "녹음 중지";
-                    recordBtnIcon.className = "fa-solid fa-stop";
-                    statusEl.textContent = "🎙️ 녹음 중... (버튼을 다시 눌러 멈추세요)";
-                } catch (err) {
-                    alert("마이크 접근 권한이 필요합니다.");
+                        recordBtn.classList.add("recording");
+                        recordBtn.querySelector('span').textContent = "녹음 중지";
+                        recordBtn.querySelector('i').className = "fa-solid fa-stop";
+                        statusEl.textContent = "🎙️ 녹음 중...";
+                    } catch (err) { alert("마이크 권한이 필요합니다."); }
+                } else {
+                    mediaRecorder.stop();
+                    recordBtn.classList.remove("recording");
+                    recordBtn.querySelector('span').textContent = "다시 녹음하기";
+                    recordBtn.querySelector('i').className = "fa-solid fa-rotate-right";
+                    statusEl.textContent = "녹음 완료";
                 }
-            } else {
-                mediaRecorder.stop();
-                recordBtn.classList.remove("recording");
-                recordBtnText.textContent = "다시 녹음하기";
-                recordBtnIcon.className = "fa-solid fa-rotate-right";
-                statusEl.textContent = "✅ 녹음이 완료되었습니다. 생성 시작을 눌러주세요.";
-            }
-        };
+            };
+        }
 
-        // 3. 서버 전송 로직
+        // [핵심] 서버 요청 및 스트리밍 처리
         document.getElementById('submitBtn').onclick = async () => {
             const lang = document.getElementById('target-lang').value;
-            // 도메인 값 가져오기
             const domain = document.getElementById('domain-select').value;
-
             if (!lang) return alert("언어를 선택해주세요!");
 
             const formData = new FormData();
@@ -375,8 +463,7 @@
 
             if (mode === 'record') {
                 if (audioChunks.length === 0) return alert("먼저 녹음을 진행해 주세요!");
-                const blob = new Blob(audioChunks, { type: 'audio/webm' });
-                formData.append("audio", blob, "record.webm");
+                formData.append("audio", new Blob(audioChunks, { type: 'audio/webm' }), "record.webm");
             } else if (mode === 'upload') {
                 const file = document.getElementById('audio-file').files[0];
                 if (!file) return alert("파일을 선택하세요!");
@@ -387,18 +474,43 @@
                 formData.append("text", text);
             }
 
-            statusEl.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> AI가 콘텐츠를 생성하고 있습니다...';
+            statusEl.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> AI가 생각하고 있어요... (번역 검증 중)';
             document.getElementById('submitBtn').disabled = true;
             document.getElementById('submitBtn').style.opacity = "0.7";
 
             try {
-                const res = await fetch("/api/generate-content", { method: "POST", body: formData });
-                const data = await res.json();
+                const response = await fetch("/api/generate-content", { method: "POST", body: formData });
 
-                sessionStorage.setItem("resultData", JSON.stringify(data));
-                location.href = "/result.html";
+                if (!response.ok) throw new Error("서버 오류가 발생했습니다.");
+
+                // 1. 헤더 데이터 읽기 (역번역 데이터 포함)
+                const sourceText = decodeURIComponent(response.headers.get("X-Source-Text") || "");
+                const translatedText = decodeURIComponent(response.headers.get("X-Translated-Text") || "");
+                // 역번역 헤더 읽기
+                const backTranslatedText = decodeURIComponent(response.headers.get("X-Back-Translated-Text") || "검증 데이터 없음");
+
+                // 2. 오디오 Blob 수신
+                const audioBlob = await response.blob();
+                const audioUrl = URL.createObjectURL(audioBlob);
+
+                // 3. 화면 전환
+                viewInput.classList.add('hidden');
+                viewResult.classList.remove('hidden');
+
+                // 4. 데이터 바인딩
+                document.getElementById('res-source').innerText = sourceText;
+                document.getElementById('res-translated').innerText = translatedText;
+
+                //역번역 결과 표시
+                document.getElementById('res-check').innerText = backTranslatedText;
+                document.getElementById('target-badge').innerText = `2. 번역 결과 (${lang})`;
+
+                const audioEl = document.getElementById('result-audio');
+                audioEl.src = audioUrl;
+                try { await audioEl.play(); } catch (e) { console.log("자동재생 권한 필요"); }
+
             } catch (e) {
-                statusEl.innerHTML = `<span style="color:var(--danger-color)"><i class="fa-solid fa-circle-exclamation"></i> 오류: ${e.message}</span>`;
+                statusEl.innerHTML = `<span style="color:var(--danger-color)">오류: ${e.message}</span>`;
                 document.getElementById('submitBtn').disabled = false;
                 document.getElementById('submitBtn').style.opacity = "1";
             }

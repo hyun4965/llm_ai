@@ -39,9 +39,9 @@ def transcribe_audio_file_local(file_path: str) -> str:
             )
             
         result_text = transcript.text
-        print(f"✅ STT 결과: {result_text}")
+        print(f"STT 결과: {result_text}")
         return result_text
 
     except Exception as e:
-        print(f"❌ STT 변환 실패: {e}")
+        print(f"STT 변환 실패: {e}")
         return "음성 인식에 실패했습니다."
