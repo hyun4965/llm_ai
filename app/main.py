@@ -11,7 +11,7 @@ from dotenv import load_dotenv
 # 라우터 및 의존성 임포트
 from app.dependencies import get_current_user
 from app.routers.generator import router as generator_router
-# 필요한 경우 다른 라우터도 임포트 (stt_router 등)
+# 필요한 경우 다른 라우터도 임포트
 
 # 환경 변수 로드
 load_dotenv()

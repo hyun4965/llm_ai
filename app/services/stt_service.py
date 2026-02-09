@@ -2,7 +2,7 @@ import os
 from pydub import AudioSegment
 from openai import OpenAI
 from dotenv import load_dotenv
-
+from faster_whisper import WhisperModel
 load_dotenv()
 
 # OpenAI 클라이언트 초기화

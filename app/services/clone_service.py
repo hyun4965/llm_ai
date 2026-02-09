@@ -28,10 +28,8 @@ def clone_voice_and_save(text: str, language: str, speaker_wav: str, output_path
     voice_id = None
     
     try:
-        # ==========================================
         # 1. 목소리 등록 (Add Voice) - 복제 시작
-        # ==========================================
-        print(f"📡 일레븐랩스 API로 내 목소리 등록 요청 중... ({os.path.basename(speaker_wav)})")
+        print(f"일레븐랩스 API로 내 목소리 등록 요청 중... ({os.path.basename(speaker_wav)})")
         
         add_url = "https://api.elevenlabs.io/v1/voices/add"
         
@@ -55,12 +53,10 @@ def clone_voice_and_save(text: str, language: str, speaker_wav: str, output_path
             
         # 응답에서 voice_id 추출
         voice_id = response.json().get("voice_id")
-        print(f"✅ 목소리 등록 완료! ID: {voice_id}")
+        print(f"목소리 등록 완료! ID: {voice_id}")
 
-        # ==========================================
         # 2. 오디오 생성 (Text to Speech)
-        # ==========================================
-        print(f"🗣️ 내 목소리로 오디오 생성 시작... (내용: {text[:15]}...)")
+        print(f"내 목소리로 오디오 생성 시작... (내용: {text[:15]}...)")
         
         generate_url = f"https://api.elevenlabs.io/v1/text-to-speech/{voice_id}/stream"
         
@@ -89,23 +85,20 @@ def clone_voice_and_save(text: str, language: str, speaker_wav: str, output_path
                 if chunk:
                     f.write(chunk)
                     
-        print(f"💾 파일 저장 완료: {output_path}")
+        print(f"파일 저장 완료: {output_path}")
         return output_path
 
     except Exception as e:
-        print(f"❌ 오류 발생: {e}")
+        print(f"오류 발생: {e}")
         raise e
 
     finally:
-        # ==========================================
         # 3. 목소리 삭제 (Delete Voice)
-        # ==========================================
-        # Starter 플랜은 슬롯이 10개이므로, 다 쓰면 꽉 찹니다. 
-        # 그래서 사용 후 바로 지워주는 것이 좋습니다.
+        # Starter 플랜은 슬롯이 10개이므로 다 쓰지 않게 관리해야 함
         if voice_id:
             try:
                 delete_url = f"https://api.elevenlabs.io/v1/voices/{voice_id}"
                 del_response = requests.delete(delete_url, headers=headers)
-                print(f"🗑️ 임시 목소리 삭제 완료 (슬롯 반환)")
+                print(f"임시 목소리 삭제 완료 (슬롯 반환)")
             except Exception as e:
-                print(f"⚠️ 목소리 삭제 실패 (수동 삭제 필요): {e}")
+                print(f"목소리 삭제 실패 (수동 삭제 필요): {e}")
